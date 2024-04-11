@@ -1,14 +1,11 @@
-interface Category {
-    id: number;
-    name: string;
-    image: string;
-}
-const CategoryItem: React.FC<Category> = ({name, image}) => {
-    const imageUrl = `http://laravel.web.api.com:8000/uploads/1200_${image}`;
+import { ICategory } from "../../interfaces/category";
+import { API_URL } from "../../utils/apiUrl.ts";
+export const CategoryItem: React.FC<ICategory> = ({name, image}) => {
+    const imageUrl =  API_URL + `/uploads/1200_${image}`;
     return (
         <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
             <a href="#">
-                <img className="rounded-t-lg w-full" src={imageUrl} alt={name} />
+                <img className="rounded-t-lg w-full h-64 object-cover" src={imageUrl} alt={name} />
             </a>
             <div className="p-5">
                 <a href="#">
@@ -24,5 +21,3 @@ const CategoryItem: React.FC<Category> = ({name, image}) => {
         </div>
     );
 }
-
-export default CategoryItem;

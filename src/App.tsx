@@ -1,5 +1,5 @@
 // import './App.css'
-import CategoryList from "./components/Category/categoryList.tsx";
+import {CategoryList} from "./components/Category/CategoryList.tsx";
 import {Route, Routes} from "react-router-dom";
 import NotFoundPage from "./Pages/NotFoundPage.tsx";
 import AdminLayout from "./components/containers/admin/AdminLayout.tsx";
