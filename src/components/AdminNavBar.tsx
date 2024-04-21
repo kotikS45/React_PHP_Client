@@ -42,10 +42,10 @@ const AdminNavBar = ({ showSidebar, setShowSidebar }: AdminNavbarProps) => {
                         <ul className="flex w-full list-none flex-col">
                             <MenuItem title="Sign In" path={"/sign-in"} icon={<IconUser />} variants="DARK" />
                         </ul>
-                        <Button variant={"TOGGLE"}>
+                        <Button variant={"icon"}>
                             <IconBell />
                         </Button>
-                        <Button onClick={() => setOpenSettings(!openSettings)} variant={"TOGGLE"}>
+                        <Button onClick={() => setOpenSettings(!openSettings)} variant={"icon"}>
                             <IconSettings />
                         </Button>
                     </div>

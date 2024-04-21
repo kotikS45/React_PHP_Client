@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { API_URL } from "../utils/apiUrl.ts";
-import {ICategory, ICreateCategory} from "../interfaces/category";
+import { ICategory, ICreateCategory, IEditCategory } from "../types/types.ts";
 
 export const categoryApi = createApi({
     reducerPath: "categoryApi",
@@ -11,6 +11,11 @@ export const categoryApi = createApi({
             query: () => "/categories",
             providesTags: ["Category"],
         }),
+
+        getCategory: builder.query<ICategory, number>({
+            query: (id) => `/categories/${id}`,
+        }),
+
         addCategory: builder.mutation({
             query: (category: ICreateCategory) => {
                 const categoryFormData = new FormData();
@@ -27,6 +32,38 @@ export const categoryApi = createApi({
             //Привязуємося до тега, якщо нічого не змінилося(залишаємо стера, якщо є зміни то оновляємо)
             invalidatesTags: ["Category"],
         }),
+
+        editCategory: builder.mutation({
+            query: ({ id, category }: { id: number; category: IEditCategory }) => {
+                const categoryFormData = new FormData();
+                if (category.image) {
+                    categoryFormData.append("image", category.image);
+                }
+                categoryFormData.append("name", category.name);
+                categoryFormData.append("description", category.description);
+
+                return {
+                    url: `/categories/update/${id}`,
+                    method: "POST",
+                    body: categoryFormData,
+                };
+            },
+            invalidatesTags: ["Category"],
+        }),
+
+        deleteCategory: builder.mutation({
+            query: (id) => ({
+                url: `/categories/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Category"],
+        }),
     }),
 });
-export const { useGetCategoriesQuery, useAddCategoryMutation } = categoryApi;
+export const {
+    useGetCategoriesQuery,
+    useGetCategoryQuery,
+    useAddCategoryMutation,
+    useDeleteCategoryMutation,
+    useEditCategoryMutation,
+} = categoryApi;
