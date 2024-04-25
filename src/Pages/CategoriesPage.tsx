@@ -6,13 +6,21 @@ import { Button } from "../components/ui/Button.tsx";
 import { useState } from "react";
 import { useDeleteCategoryMutation, useGetCategoriesQuery } from "../services/category.ts";
 import {showToast} from "../utils/showToast.ts";
+import { useSearchParams } from "react-router-dom";
+import { Input } from "../components/ui/Input.tsx";
+import {useDebouncedCallback} from "use-debounce";
 
 const CategoriesPage = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
+
     const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
     const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
     const [currentCategory, setCurrentCategory] = useState<number | null>(null);
 
-    const { data, isLoading } = useGetCategoriesQuery();
+    const { data: categories, isLoading } = useGetCategoriesQuery({
+        page: Number(searchParams.get("page")) || 1,
+        search: searchParams.get("search") || ""
+    });
     const [deleteCategory] = useDeleteCategoryMutation();
 
     const handleDeleteCategory = async (id: number) => {
@@ -37,6 +45,16 @@ const CategoriesPage = () => {
         }
     };
 
+    const handleSearch = useDebouncedCallback((term) => {
+        if (term) {
+            searchParams.set("search", term);
+            setSearchParams(searchParams);
+        } else {
+            searchParams.delete("search");
+            setSearchParams(searchParams);
+        }
+    }, 400);
+
     return (
         <>
             <div className="mb-3 flex flex-row-reverse">
@@ -44,9 +62,19 @@ const CategoriesPage = () => {
                     <IconPencilPlus />
                     Add new category
                 </Button>
+                <Input
+                    defaultValue={searchParams.get("search") || ""}
+                    onChange={(e) => {
+                        handleSearch(e.target.value);
+                    }}
+                    className="hidden md:flex"
+                    variant="search"
+                    placeholder="Search..."
+                />
             </div>
             <CategoryList
-                categories={data}
+                categories={categories?.data}
+                totalPages={categories?.last_page}
                 edit={handleEditCategory}
                 remove={handleDeleteCategory}
                 isLoading={isLoading}
