@@ -4,18 +4,24 @@ import {ICategory, ICategoryResponse, ICreateCategory, IEditCategory} from "../t
 
 export const categoryApi = createApi({
     reducerPath: "categoryApi",
-    baseQuery: fetchBaseQuery({ baseUrl: `${API_URL}/api` }),
+    baseQuery: fetchBaseQuery({
+        baseUrl: `${API_URL}/api`,
+        prepareHeaders: (headers) => {
+
+            const token = localStorage.getItem("authToken");
+            if(token) {
+                headers.set('authorization', `Bearer ${token}`);
+            }
+            console.log("Headers", headers.get("Authorization"));
+            return headers;
+        }
+    }),
     tagTypes: ["Category"],
     endpoints: (builder) => ({
         getCategories: builder.query<ICategoryResponse, { page: number; search: string }>({
             query: ({ page, search }) => `/categories?page=${page}&search=${search}`,
             providesTags: ["Category"],
         }),
-
-        getCategory: builder.query<ICategory, number>({
-            query: (id) => `/categories/${id}`,
-        }),
-
         addCategory: builder.mutation({
             query: (category: ICreateCategory) => {
                 const categoryFormData = new FormData();
@@ -24,7 +30,7 @@ export const categoryApi = createApi({
                 categoryFormData.append("description", category.description);
 
                 return {
-                    url: "/categories/store",
+                    url: "/categories/create",
                     method: "POST",
                     body: categoryFormData,
                 };
@@ -40,15 +46,19 @@ export const categoryApi = createApi({
                     categoryFormData.append("image", category.image);
                 }
                 categoryFormData.append("name", category.name);
-                categoryFormData.append("description", category.description);
+                //categoryFormData.append("description", category.description);
 
                 return {
-                    url: `/categories/update/${id}`,
+                    url: `/categories/edit/${id}`,
                     method: "POST",
                     body: categoryFormData,
                 };
             },
             invalidatesTags: ["Category"],
+        }),
+
+        getCategory: builder.query<ICategory, number>({
+            query: (id) => `/categories/${id}`,
         }),
 
         deleteCategory: builder.mutation({
@@ -62,8 +72,8 @@ export const categoryApi = createApi({
 });
 export const {
     useGetCategoriesQuery,
-    useGetCategoryQuery,
     useAddCategoryMutation,
     useDeleteCategoryMutation,
     useEditCategoryMutation,
+    useGetCategoryQuery,
 } = categoryApi;
